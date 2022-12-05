@@ -1,5 +1,6 @@
 import pymysql
 
+
 class Database:
     def connect(self):
         return pymysql.connect(host="localhost", user="root", password="g453u794", database="employeemanagement",
@@ -10,8 +11,9 @@ class Database:
         cursor = con.cursor()
 
         try:
-            cursor.execute("INSERT INTO employees(first_name,last_name,personal_email_id, phone_number) VALUES(%s, %s, %s, %s)",
-                           (data['first_name'], data['last_name'], data['personal_email_id'],data['phone_number'],))
+            cursor.execute(
+                "INSERT INTO employees(first_name,last_name,personal_email_id, phone_number) VALUES(%s, %s, %s, %s)",
+                (data['first_name'], data['last_name'], data['personal_email_id'], data['phone_number'],))
             con.commit()
 
             return cursor.lastrowid
@@ -21,12 +23,12 @@ class Database:
         finally:
             con.close()
 
-    def insert_dept_emp(self,data):
+    def insert_dept_emp(self, data):
         con = Database.connect(self)
         cursor = con.cursor()
         try:
             cursor.execute(
-                "INSERT INTO dept_emp(emp_no, dept_no, from_date, to_date, is_active) VALUES(%s, %s, %s, %s, %s)",
+                "INSERT INTO dept_emp(emp_id, dept_no, from_date, to_date, is_active) VALUES(%s, %s, %s, %s, %s)",
                 (data['emp_no'], data['dept_no'], data['from_date'], data['to_date'], data['is_active']))
             con.commit()
             return cursor.lastrowid
@@ -55,8 +57,9 @@ class Database:
         con = Database.connect(self)
         cursor = con.cursor()
         try:
-            cursor.execute("UPDATE employees set first_name = %s, last_name = %s, personal_email_id = %s, phone_number=%s where emp_id = %s",
-                           (data['first_name'], data['last_name'], data['personal_email_id'],data['phone_number'], id,))
+            cursor.execute(
+                "UPDATE employees set first_name = %s, last_name = %s, personal_email_id = %s, phone_number=%s where emp_id = %s",
+                (data['first_name'], data['last_name'], data['personal_email_id'], data['phone_number'], id,))
             con.commit()
 
             return True
@@ -85,7 +88,7 @@ class Database:
         con = Database.connect(self)
         cursor = con.cursor()
         try:
-            cursor.execute("UPDATE dept_emp set dept_no = %s where emp_no = %s",
+            cursor.execute("UPDATE dept_emp set dept_no = %s where emp_id = %s",
                            (data['dept_no'], id,))
             con.commit()
 
@@ -100,14 +103,14 @@ class Database:
         con = Database.connect(self)
         cursor = con.cursor()
         try:
-            cursor.execute("DELETE FROM salaries where emp_id = %s", (id,))
-            cursor.execute("DELETE FROM dept_emp where emp_no = %s", (id,))
+            # cursor.execute("DELETE FROM salaries where emp_id = %s", (id,))
+            # cursor.execute("DELETE FROM dept_emp where emp_id = %s", (id,))
             cursor.execute("DELETE FROM employees where emp_id = %s", (id,))
             con.commit()
             return True
-        except:
+        except Exception:
             con.rollback()
-            return False
+            raise str(Exception)
         finally:
             con.close()
 
@@ -118,7 +121,7 @@ class Database:
         try:
             if id == None:
                 sql = "SELECT * FROM employees AS e JOIN salaries AS s ON e.emp_id = s.emp_id" \
-                      " JOIN dept_emp as de ON e.emp_id = de.emp_no" \
+                      " JOIN dept_emp as de ON e.emp_id = de.emp_id" \
                       " JOIN deparments as d ON de.dept_no= d.dep_no order by e.emp_id DESC"
                 print(sql)
                 cursor.execute(sql)
@@ -147,14 +150,12 @@ class Database:
         con = Database.connect(self)
         cursor = con.cursor()
         try:
-            sql ="SELECT * FROM employees AS e JOIN salaries AS s ON e.emp_id = s.emp_id" \
-                 " JOIN dept_emp as de ON e.emp_id = de.emp_no" \
-                 " JOIN deparments as d ON de.dept_no= d.dep_no WHERE e.emp_id = %s"
+            sql = "SELECT * FROM employees AS e JOIN salaries AS s ON e.emp_id = s.emp_id" \
+                  " JOIN dept_emp as de ON e.emp_id = de.emp_id" \
+                  " JOIN deparments as d ON de.dept_no= d.dep_no WHERE e.emp_id = %s"
             cursor.execute(sql, (id,))
             return cursor.fetchall()
         except:
             return ()
         finally:
             con.close()
-
-

@@ -2,20 +2,20 @@ from flask import Flask, flash, render_template, redirect, url_for, request, ses
 from module.database import Database
 import datetime
 
-
 app = Flask(__name__)
 app.secret_key = "mySc@$1emp"
 db = Database()
 
+
 @app.route('/')
 def index():
     response = {}
-    response['employees']= db.get_all_employees(None)
+    response['employees'] = db.get_all_employees(None)
     response['dept'] = db.get_deparments_list()
-    print(response['dept'])
-    return render_template('index.html', data= response)
+    return render_template('index.html', data=response)
 
-@app.route('/create',  methods=['POST', 'GET'])
+
+@app.route('/create', methods=['POST', 'GET'])
 def createEmployee():
     if request.method == 'POST' and request.form['save']:
         emp_data = {"first_name": request.form['first_name'],
@@ -25,15 +25,15 @@ def createEmployee():
                     }
         emp_id = db.insert(emp_data)
         if emp_id:
-            dept_emp = {'emp_no':emp_id,
-                        "dept_no":request.form['dept_no'],
+            dept_emp = {'emp_no': emp_id,
+                        "dept_no": request.form['dept_no'],
                         "from_date": datetime.datetime.now(),
-                        "to_date":datetime.datetime.now(),
-                        "is_active":1}
-            salary_det = {'emp_id':emp_id,
+                        "to_date": datetime.datetime.now(),
+                        "is_active": 1}
+            salary_det = {'emp_id': emp_id,
                           "salary": request.form['salary'],
                           "from_date": datetime.datetime.now(),
-                          "to_date":datetime.datetime.now()}
+                          "to_date": datetime.datetime.now()}
             db.insert_dept_emp(dept_emp)
             db.insert_salary_emp(salary_det)
             flash("A new employee has been added")
@@ -45,13 +45,15 @@ def createEmployee():
         flash("Please enter proper details")
         return redirect(url_for('index'))
 
+
 @app.route('/loadempdata', methods=['POST', 'GET'])
 def ajax_load_emp_data():
     response = {}
     emp_id = request.form['emp_id']
     response['employees'] = db.get_all_employee_details_by_id(emp_id)
     response['dept'] = db.get_deparments_list()
-    return jsonify({'htmlresponse': render_template('emp_load_ajax.html', data= response)})
+    return jsonify({'htmlresponse': render_template('emp_load_ajax.html', data=response)})
+
 
 @app.route('/update', methods=['POST', 'GET'])
 def update_emp_data():
@@ -63,10 +65,10 @@ def update_emp_data():
                     }
         emp_id = request.form['emp_id']
         if db.emp_detail_update(emp_id, emp_data):
-            dept_emp = {'emp_no':emp_id,
-                        "dept_no":request.form['dept_no'],
+            dept_emp = {'emp_no': emp_id,
+                        "dept_no": request.form['dept_no'],
                         }
-            salary_det = {'emp_id':emp_id,
+            salary_det = {'emp_id': emp_id,
                           "salary": request.form['salary'],
                           }
             db.emp_slaray_update(emp_id, salary_det)
@@ -80,13 +82,15 @@ def update_emp_data():
         flash("Please enter proper details")
         return redirect(url_for('index'))
 
+
 @app.route('/delete_emp', methods=['POST', 'GET'])
 def delete_emp():
     emp_id = request.form['emp_id']
-    if(db.delete(emp_id)):
+    if db.delete(emp_id):
         return 'Success'
     else:
         return 'Error'
+
 
 if __name__ == '__main__':
     app.run()
