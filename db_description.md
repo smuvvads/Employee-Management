@@ -22,7 +22,7 @@ Functional dependent on `emp_id`
       `personal_email_id` varchar(145) DEFAULT NULL,
       `company_email_id` varchar(145) DEFAULT NULL,
       `phone_number` varchar(20) DEFAULT NULL,
-      `gendar` varchar(45) DEFAULT NULL,
+      `gender` varchar(45) DEFAULT NULL,
       `hire_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `is_active` tinyint DEFAULT NULL,
       `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
